@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 
-start_year = 2018
+start_year = 2019
 end_year = 2020
 
 
@@ -22,7 +22,8 @@ while year <= end_year:
     frames.append(df)
     pd.read_csv(f'../data/nba_{year}.csv')
     year += 1
-df = pd.concat(frames)
+df = pd.concat(frames, ignore_index=True)
+df.reindex()
 df['mp'] = df['mp'].map(lambda mp: mp_map(mp))
 df['dkp'] = 0.0
 double_cols = ['pts', 'trb', 'ast', 'stl', 'blk']

@@ -8,11 +8,6 @@ from os import path
 window_size = 10
 child_sets = [
     {
-        'name': 'points',
-        'offset': True,
-        'cols': []
-    },
-    {
         'name': 'home',
         'offset': False,
         'cols': ['team_is_home']
@@ -52,6 +47,7 @@ if not path.exists(f'../data/nba_win_{window_size}.csv'):
         priors = df.loc[[id, 'game_id' <= game_id], :].sort_values('game_id', ascending=False)
         row = {}
         row['id'] = id
+        row['game_id'] = game_id
         for prior_index in range(window_size):
             has_value = priors.shape[0] > prior_index
             row[f'has_value_p{prior_index}'] = has_value
@@ -75,17 +71,20 @@ for child_set in child_sets:
         player_binary = [int(x) for x in list('{0:0b}'.format(player_index))]
         while len(player_binary) < 10:
             player_binary.append(0)
-        matrix_row.extend(player_binary)
+        #matrix_row.extend(player_binary)
         matrix.append(matrix_row)
         for prior_index in range(window_size - 1):
-            i = prior_index
+            real_p_index = prior_index
             if is_offset:
-                i += 1
+                real_p_index += 1
+            if abs(row[f'dkp_p{prior_index+1}'] - row[f'dkp_p0']) <= 0.1:
+                print(row)
+                print(str(i) + ' ' + str(prior_index) + ' ' + str(row[f'dkp_p{prior_index+1}']) + ' ' + str(row[f'dkp_p0']))
             matrix_row.append(row[f'dkp_p{prior_index+1}'])
             matrix_row.append(row[f'has_value_p{prior_index+1}'])
             for col in child_set['cols']:
-                matrix_row.append(row[f'{col}_p{i}'])
-    np_matrix = np.matrix(matrix)
+                matrix_row.append(row[f'{col}_p{real_p_index}'])
+    np_matrix = np.matrix(matrix, dtype='float')
     np_matrix = scale(np_matrix, -1, 1)
     np.save('../data/'+ child_set['name'], np_matrix)
     print(np_matrix.shape)

@@ -4,10 +4,10 @@ from tensorflow.keras import layers
 import pandas as pd
 
 BATCH_SIZE = 1
-EPOCH = 100
-LEARN_RATE = .0001
+EPOCH = 200
+LEARN_RATE = .0002
 
-files = ['home', 'player']
+files = ['home']
 y = np.load('../data/y.npy')
 class PrintDot(keras.callbacks.Callback):
   def on_epoch_end(self, epoch, logs):
@@ -28,8 +28,6 @@ for file in files:
   optimizer = keras.optimizers.RMSprop(LEARN_RATE)
 
   model.compile(loss='mse', optimizer=optimizer, metrics=['mae', 'mse'])
-  print(file)
+  print(y)
   history = model.fit(matrix, y, epochs=EPOCH, validation_split = 0.4, callbacks=[PrintDot()])
   model.save(file)
-  print(model.predict(matrix[:100, :]))
-  print(y[:100])
