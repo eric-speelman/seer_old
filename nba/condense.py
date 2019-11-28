@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 
-start_year = 2019
+start_year = 2018
 end_year = 2020
 
 
@@ -24,7 +24,7 @@ while year <= end_year:
     year += 1
 df = pd.concat(frames)
 df['mp'] = df['mp'].map(lambda mp: mp_map(mp))
-df['dkp'] = 0
+df['dkp'] = 0.0
 double_cols = ['pts', 'trb', 'ast', 'stl', 'blk']
 for i, row in df.iterrows():
     dkp = row['pts'] + row['fg3'] * 0.5 + row['trb'] * 1.25 + row['ast'] * 1.5 + row['stl'] * 2 + row['blk'] * 2 + row['tov'] * -0.5

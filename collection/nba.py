@@ -6,7 +6,7 @@ import csv
 months = ['september', 'october', 'november', 'december', 'january', 'feburary', 'march', 'april', 'may']
 data_path = '../data/'
 player_data = []
-start_year = 2018
+start_year = 2020
 end_year = 2020
 
 def collect_game(href):
@@ -24,6 +24,7 @@ def collect_game(href):
         game_data['venue'] = game_scoreboard.contents[2].contents[0].split(',')[0]
     else:
         game_data['venue'] = ''
+    is_home = 0
     for team_html in html.select('div.scorebox > div')[:2]:
         data = {}
         team_data.append(data)
@@ -34,6 +35,8 @@ def collect_game(href):
         score_parts = list(map(lambda x: int(x), team_html.contents[4].contents[0].split('-')))
         data['season_wins'] = score_parts[0]
         data['season_losses'] = score_parts[1]
+        data['is_home'] = is_home
+        is_home = 1
     if team_data[0]['points'] > team_data[1]['points']:
         team_data[0]['season_wins'] -= 1
         team_data[1]['season_losses'] -= 1
@@ -68,7 +71,7 @@ def collect_game(href):
                 
             
 year = start_year
-while year < end_year:
+while year <= end_year:
     for month in months:
         html = collect(f'https://www.basketball-reference.com/leagues/NBA_{year}_games-{month}.html')
         if html is not None:
