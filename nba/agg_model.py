@@ -5,9 +5,9 @@ import pandas as pd
 
 BATCH_SIZE = 1
 EPOCH = 50
-LEARN_RATE = .0001
+LEARN_RATE = .00001
 
-model_file_names = ['playing_time', 'home', 'dkp']
+model_file_names = ['playing_time', 'home', 'dkp', 'score', 'team', 'opp_team']
 models = []
 model_data = []
 for model_file in model_file_names:
@@ -40,11 +40,10 @@ print(f'Matrix shape {matrix.shape}')
 width = matrix.shape[1]
 model = keras.Sequential([
     layers.Dense(width, activation='relu', input_shape=[width]),
-    layers.Dense(width, activation='relu'),
     layers.Dense(1)
 ])
 
-optimizer = keras.optimizers.RMSprop(LEARN_RATE)
+optimizer = keras.optimizers.Adam(LEARN_RATE)
 
 model.compile(loss='mse', optimizer=optimizer, metrics=['mae', 'mse'])
 print(y)
