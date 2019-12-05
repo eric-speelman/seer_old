@@ -10,27 +10,16 @@ window_size = 10
 child_sets = [
     {
         'name': 'empty',
-        'cols': [],
-        'prior_cols': []
-    },
-    {
-        'name': 'home',
         'cols': [{
             'offset': False,
             'calc': False,
             'col': 'team_is_home'
-        },
-        {
-            'offset': False,
-            'calc': False,
-            'col': 'game_day'
-        },
-        {
-            'offset': False,
-            'calc': False,
-            'col': 'game_season'
         }],
-        'prior_cols': []
+        'prior_cols': [{
+            'offset': True,
+            'calc': False,
+            'col': 'dkp'
+        }]
     }
 ]
 data = []
@@ -179,4 +168,5 @@ for child_set in child_sets:
     print('loading...')
     matrix = np.load('../data/'+ child_set['name'] + '.npy')
     matrix = scale(matrix, 0, 1)
+    print('saving...')
     np.save('../data/'+ child_set['name'], matrix)

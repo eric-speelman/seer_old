@@ -6,7 +6,7 @@ import csv
 months = ['september', 'october', 'november', 'december', 'january', 'feburary', 'march', 'april', 'may']
 data_path = '../data/'
 player_data = []
-start_year = 2020
+start_year = 2000
 end_year = 2020
 
 def collect_game(href):
