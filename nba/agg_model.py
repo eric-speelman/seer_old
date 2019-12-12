@@ -7,7 +7,7 @@ BATCH_SIZE = 1
 EPOCH = 50
 LEARN_RATE = .00001
 
-model_file_names = ['playing_time', 'home', 'dkp', 'score', 'team', 'opp_team']
+model_file_names = ['home', 'dkp', 'mp']
 models = []
 model_data = []
 for model_file in model_file_names:

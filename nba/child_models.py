@@ -4,10 +4,10 @@ from tensorflow.keras import layers
 import pandas as pd
 
 BATCH_SIZE = 32
-EPOCH = 100
-LEARN_RATE = .1
+EPOCH = 50
+LEARN_RATE = .000001
 
-files = ['empty']
+files = ['full']
 y = np.load('../data/y.npy')
 class PrintDot(keras.callbacks.Callback):
   def on_epoch_end(self, epoch, logs):
@@ -21,10 +21,11 @@ for file in files:
   print(f'Matrix shape {matrix.shape}')
   width = matrix.shape[1]
   model = keras.Sequential([
-      #layers.Dense(width, activation='relu', input_shape=[width]),
-      #layers.Dense(width, activation='relu'),
+      layers.Dense(width * 25, activation='relu', input_shape=[width]),
+      layers.Dense(width * 10, activation='relu'),
+      #layers.Dense(width * 2, activation='relu'),
       #layers.Dropout(rate=0.25),
-      layers.Dense(1, input_shape=[width])
+      layers.Dense(1)
   ])
   optimizer = keras.optimizers.Adam(LEARN_RATE)
 

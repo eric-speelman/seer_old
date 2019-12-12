@@ -5,26 +5,78 @@ import math
 import os.path
 import time
 from os import path
+from sklearn import feature_extraction
 
 window_size = 10
-child_sets = [
+child_sets_config = [
     {
-        'name': 'empty',
+        'name': 'full',
         'cols': [{
             'offset': False,
             'calc': False,
             'col': 'team_is_home'
+        },
+        {
+            'offset': False,
+            'calc': False,
+            'col': 'game_season'
+        },
+        {
+            'offset': False,
+            'calc': False,
+            'col': 'game_day'
+        },
+        {
+            'offset': True,
+            'calc': False,
+            'col': 'team_points'
+        },
+        {
+            'offset': True,
+            'calc': False,
+            'col': 'team_season_wins'
+        },
+        {
+            'offset': True,
+            'calc': False,
+            'col': 'team_season_losses'
+        },
+        {
+            'offset': True,
+            'calc': False,
+            'col': 'opp_team_points'
+        },
+        {
+            'offset': True,
+            'calc': False,
+            'col': 'opp_team_season_wins'
+        },
+        {
+            'offset': True,
+            'calc': False,
+            'col': 'opp_team_season_losses'
         }],
-        'prior_cols': [{
+        'prior_cols': [
+        {
             'offset': True,
             'calc': False,
             'col': 'dkp'
+        },
+        {
+            'offset': True,
+            'calc': False,
+            'col': 'mp'
         }]
     }
 ]
+child_sets_gen = ['full']
+child_sets = []
+for cs in child_sets_config:
+    if cs['name'] in child_sets_gen:
+        child_sets.append(cs)
 data = []
 start = datetime.now()
-stats = ['dkp', 'game_venue', 'team_id', 'opp_team_id', 'game_season', 'game_day', 'mp', 'team_points', 'team_season_wins', 'team_season_losses','team_is_home', 'team_points', 'team_season_wins', 'team_season_losses']
+stats = ['dkp', 'game_venue', 'team_id', 'opp_team_id', 'game_season', 'game_day', 'mp', 'team_points', 'team_season_wins', 'team_season_losses','team_is_home', 'opp_team_points', 'opp_team_season_wins', 'opp_team_season_losses']
 avgs = []
 for child_set in child_sets:
     for col in child_set['cols']:
@@ -41,7 +93,9 @@ def scale(X, x_min, x_max):
     denom = X.max(axis=0) - X.min(axis=0)
     denom[denom==0] = 1
     return x_min + nom/denom
-
+hasher = feature_extraction.FeatureHasher(n_features=10, input_type='string')
+def hash_encoder(item):
+    return hasher.transform(item)
 def binary_encode(arr, item, length):
     index = arr.index(item)
     binary = [int(x) for x in list('{0:0b}'.format(index))]
@@ -107,6 +161,7 @@ print(prior_df['team_is_home_p0'].shape)
 players = list(set(list(prior_df['id'])))
 venues = list(set(list(prior_df['game_venue_p0'])))
 teams = list(set(list(prior_df['team_id_p0'])))
+start = time.time()
 for child_set in child_sets:
     print('Generating for ' + child_set['name'])
     matrix = []
@@ -115,9 +170,10 @@ for child_set in child_sets:
         cnt += 1
         if cnt % 1000 == 1:
             end = time.time()
-            print(f'Window {cnt}/{prior_df.shape[0]}')
+            print(f'Window {cnt}/{prior_df.shape[0]} {end-start}')
+            start = time.time()
         matrix_row = []
-        player_binary = one_hot(players,row['id'])
+        player_binary = binary_encode(players, row['id'], 11)
         matrix_row.extend(player_binary)
         matrix.append(matrix_row)
         if len(child_set['prior_cols']) > 0:
@@ -158,6 +214,11 @@ for child_set in child_sets:
                     bench_cnt += 1
             else:
                 matrix_row.append(row[f'{col_name}_p{prior_index}'])
+        #print('aaaaa')
+        #print(matrix_row)
+        #print('bbbbbb')
+        #print(matrix)
+        #np.matrix(matrix, dtype='float32')
     np_matrix = np.matrix(matrix, dtype='float32')
     print('saving...')
     np.save('../data/'+ child_set['name'], np_matrix)
